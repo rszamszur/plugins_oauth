@@ -20,7 +20,7 @@ import com.github.scribejava.core.oauth2.bearersignature.BearerSignatureURIQuery
 
 public class DexApi extends DefaultApi20 {
 
-  private static final String AUTHORIZE_URL = "%s/dex/auth";
+  private static final String AUTHORIZE_URL = "%s/auth";
 
   private final String rootUrl;
 
@@ -35,7 +35,7 @@ public class DexApi extends DefaultApi20 {
 
   @Override
   public String getAccessTokenEndpoint() {
-    return String.format("%s/dex/token", rootUrl);
+    return String.format("%s/token", rootUrl);
   }
 
   @Override
