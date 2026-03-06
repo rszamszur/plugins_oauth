@@ -41,6 +41,7 @@ import com.googlesource.gerrit.plugins.oauth.OAuthServiceProviderExternalIdSchem
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,7 @@ public class DexOAuthService implements OAuthServiceProvider {
   private final OAuth20Service service;
   private final String rootUrl;
   private final String domain;
+  private final String usernameClaimKey;
   private final String serviceName;
   private final String extIdScheme;
 
@@ -67,6 +69,12 @@ public class DexOAuthService implements OAuthServiceProvider {
       throw new ProvisionException("Root URL must be absolute URL");
     }
     domain = cfg.getString(InitOAuth.DOMAIN, null);
+
+    usernameClaimKey = cfg.getString(InitOAuth.USERNAME_CLAIM_KEY, "email");
+    if (!List.of("email", "preferred_username").contains(usernameClaimKey)) {
+      throw new ProvisionException("Username claim key can be either email or preferred_username");
+    }
+
     serviceName = cfg.getString(InitOAuth.SERVICE_NAME, "Dex OAuth2");
 
     service =
@@ -93,16 +101,21 @@ public class DexOAuthService implements OAuthServiceProvider {
     JsonObject claimObject = claimJson.getAsJsonObject();
     JsonElement emailElement = claimObject.get("email");
     JsonElement nameElement = claimObject.get("name");
+    JsonElement usernameElement = claimObject.get(usernameClaimKey);
     if (isNull(emailElement)) {
       throw new IOException("Response doesn't contain email field");
     }
     if (nameElement == null || nameElement.isJsonNull()) {
       throw new IOException("Response doesn't contain name field");
     }
+    if (isNull (usernameElement)) {
+      throw new IOException("Resposne doesn't contain field: " + usernameClaimKey);
+    }
     String email = emailElement.getAsString();
     String name = nameElement.getAsString();
-    String username = email;
-    if (domain != null && domain.length() > 0) {
+    String username = usernameElement.getAsString();
+
+    if (usernameClaimKey == "email" && domain != null && domain.length() > 0) {
       username = email.replace("@" + domain, "");
     }
 
