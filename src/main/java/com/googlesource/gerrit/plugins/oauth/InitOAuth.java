@@ -50,6 +50,7 @@ public class InitOAuth implements InitStep {
   public static final String LINK_TO_EXISTING_OPENID_ACCOUNT = "link-to-existing-openid-accounts";
   public static final String FIX_LEGACY_USER_ID = "fix-legacy-user-id";
   public static final String DOMAIN = "domain";
+  public static final String USERNAME_CLAIM_KEY = "username-claim-key";
   public static final String USE_EMAIL_AS_USERNAME = "use-email-as-username";
   public static final String USE_PREFERRED_USERNAME = "use-preferred-username";
   public static final String ROOT_URL = "root-url";
